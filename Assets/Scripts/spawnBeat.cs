@@ -79,6 +79,7 @@ public class spawnBeat : MonoBehaviour
             //Ensure audio doesn’t play more than once
             m_ToggleChange = false;
         }
+        // TODO: add pause
         //Check if you just set the toggle to false
         if (m_Play == false && m_ToggleChange == true)
         {
@@ -103,7 +104,7 @@ public class spawnBeat : MonoBehaviour
         }
 
         //print(time_elapsed);
-        time_elapsed += Time.deltaTime; // TODO: not very efficient
+        time_elapsed += Time.deltaTime; // TODO: is this efficient?
         if (current_timing_idx < timings.Length)
         {
             if (time_elapsed > timings[current_timing_idx])
