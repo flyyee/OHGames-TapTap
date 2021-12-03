@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class spawnBeat : MonoBehaviour
 {
@@ -21,9 +22,16 @@ public class spawnBeat : MonoBehaviour
 
     float next_spawn_time;
 
-    const float beat_spawn_x1 = (float)-3.9;
+    // const float beat_spawn_x1 = (float)-3.9;
+    // const float beat_spawn_x2 = (float)-1.3;
+    // const float beat_spawn_x3 = (float)+1.3;
+    // const float beat_spawn_x4 = (float)+3.9;
+    static readonly float[] beat_spawn_xlist = {-3.9f, -1.3f, 1.3f, 3.9f};
     const float beat_spawn_y = 4;
     const float beat_base_speed = 4;
+
+    float currScore = 0;
+    public Text DispScore;
 
     // Start is called before the first frame update
     void Start()
@@ -38,6 +46,8 @@ public class spawnBeat : MonoBehaviour
 
         GameObject spot = GameObject.Find("spot1");
         beats_boundary = spot.transform.position.y;
+
+        DispScore.text = "Game Score: 0";
 
         //next_spawn_time = 0;
     }
@@ -76,7 +86,7 @@ public class spawnBeat : MonoBehaviour
         {
             //Play the audio you attach to the AudioSource component
             audioSource.Play();
-            //Ensure audio doesn�t play more than once
+            //Ensure audio doesn�t play more than once
             m_ToggleChange = false;
         }
         // TODO: add pause
@@ -85,12 +95,35 @@ public class spawnBeat : MonoBehaviour
         {
             //Stop the audio
             audioSource.Stop();
-            //Ensure audio doesn�t play more than once
+            //Ensure audio doesn�t play more than once
             m_ToggleChange = false;
         }
 
         while (beats.Count > 0)
         {
+            // Check for keypresses for spots
+            // 1st spot – a/left; 2nd spot – w/up; 3rd spot – s/down; 4th spot – d/right
+            if (Input.GetKeyDown("a") || Input.GetKeyDown("left"))
+            {
+              GameObject spot = GameObject.Find("spot1");
+              currScore += spot.GetComponent<spot>().tapResponse();
+            }
+            if (Input.GetKeyDown("w") || Input.GetKeyDown("up"))
+            {
+              GameObject spot = GameObject.Find("spot2");
+              currScore += spot.GetComponent<spot>().tapResponse();
+            }
+            if (Input.GetKeyDown("s") || Input.GetKeyDown("down"))
+            {
+              GameObject spot = GameObject.Find("spot3");
+              currScore += spot.GetComponent<spot>().tapResponse();
+            }
+            if (Input.GetKeyDown("d") || Input.GetKeyDown("right"))
+            {
+              GameObject spot = GameObject.Find("spot4");
+              currScore += spot.GetComponent<spot>().tapResponse();
+            }
+
             //beat sc = beats[0].GetComponent<beat>();
             //sc.setSpeed(40);
             if (beats[0].transform.position.y < beats_boundary)
@@ -103,6 +136,9 @@ public class spawnBeat : MonoBehaviour
             }
         }
 
+        // Keep track of game score
+        DispScore.text = "Game Score: " + currScore;
+
         //print(time_elapsed);
         time_elapsed += Time.deltaTime; // TODO: is this efficient?
         if (current_timing_idx < timings.Length)
@@ -111,7 +147,10 @@ public class spawnBeat : MonoBehaviour
             {
                 current_timing_idx++;
                 // spawn a new beat!
-                spawn((float)beat_spawn_x1);
+                // spawn((float)beat_spawn_x1);
+
+                // spawn a new beat at a random lane (for testing)
+                spawn((float)beat_spawn_xlist[UnityEngine.Random.Range(0,4)]);
             }
         }
 
