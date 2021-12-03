@@ -48,6 +48,7 @@ public class spot : MonoBehaviour
 
     public float tapResponse()
     {
+        float accuracyScoreAdd = (float)0;
         try
         {
             spawnBeat cam_script = cam.GetComponent<spawnBeat>();
@@ -56,19 +57,37 @@ public class spot : MonoBehaviour
                 GameObject beat = cam_script.beats[0];
                 //GameObject beat = GameObject.Find("Beat");
                 float distance = Math.Abs(beat.transform.position.y - rb.position.y);
-                float accuracyScoreAdd = 10 / distance; // TODO: formula for calculating score
+                if (distance < 1) // award points if disk is somewhat touching the spot
+                {
+                  accuracyScoreAdd = 10*(1-distance); // or 10/distance, or anything else
+                  // +1 to streak (maybe in spawnBeat code, see comment below)
+                  if (distance < 0.25)
+                  {
+                    // perfect score – give a high score
+                    accuracyScoreAdd = 50;
+                  }
+                } else // disk is not touching the spot
+                {
+                  // undo streak (& add the score from the streak)
+                  // maybe in spawnBeat code, since zero or negative scores would undo the streak while positive scores add to the streak
+
+                  // also gotta consider if we wanna deduct points
+
+                }
+                // float accuracyScoreAdd = 10 / distance;
+
+                // TODO: formula for calculating score
                 // TODO: to prevent points glitch, prevent spam tapping when the beat is nearing the spot
                 // to achieve this, once the beat has been tapped and points have been awarded, don't allow the player to gain points from it again
                 // but if the player loses points from an inaccurate tap, they can still then get points awarded from it later
                 // TODO: if the player does not manage to tap the beat before it gets destroyed at the spot, subtract points
-                print("Add score:" + accuracyScoreAdd.ToString("0.00"));
-                return accuracyScoreAdd;
+                // print("Add score:" + accuracyScoreAdd.ToString("0.00"));
             }
         }
         catch (NullReferenceException err)
         {
             // beat gameobject has been destroyed, aka out of frame
         }
-        return (float)0;
+        return accuracyScoreAdd;
     }
 }

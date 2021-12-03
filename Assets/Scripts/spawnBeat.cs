@@ -137,7 +137,7 @@ public class spawnBeat : MonoBehaviour
         }
 
         // Keep track of game score
-        DispScore.text = "Game Score: " + currScore;
+        DispScore.text = "Game Score: " + currScore.ToString("0.00");
 
         //print(time_elapsed);
         time_elapsed += Time.deltaTime; // TODO: is this efficient?
