@@ -34,6 +34,7 @@ public class spawnBeat : MonoBehaviour
 
     static readonly string[] input_asdf = {"a", "s", "d", "f"};
     static readonly string[] input_hjkl = {"h", "j", "k", "l"};
+    public GameObject[] longBeats = {null, null, null, null};
 
     public float currScore = 0;
     public int currStreak = 0;
@@ -81,7 +82,7 @@ public class spawnBeat : MonoBehaviour
     //     beats.Add(b);
     // }
 
-    private void spawn(int lane, bool hasTail = false, int tailLength = 0)
+    private void spawn(int lane, bool hasTail = false, float tailLength = 0f)
     {
         GameObject b = Instantiate(beatPrefab) as GameObject;
         beat beat_script = b.GetComponent<beat>();
@@ -182,7 +183,7 @@ public class spawnBeat : MonoBehaviour
         //         break;
         //     }
         // }
-        for (int i = 0; i < beats.Count; i++)
+        for (int i = 0; i < 4; i++)
         {
           GameObject spot = GameObject.Find("spot" + (i+1).ToString());
           while (beats[i].Count > 0)
@@ -192,6 +193,23 @@ public class spawnBeat : MonoBehaviour
               if (Input.GetKeyDown(input_asdf[i]) || Input.GetKeyDown(input_hjkl[i]))
               {
                 spot.GetComponent<spot>().tapResponse();
+              }
+
+              // probably can improve this logic lol
+              if (longBeats[i] != null && (Input.GetKey(input_asdf[i]) || Input.GetKey(input_hjkl[i])))
+              {
+                currScore++; // this one will be called a lot so the increase shld be enough lol
+                tail tail_script = longBeats[i].GetComponent<tail>();
+                if (tail_script.length < 1 || longBeats[i].transform.position.y < beats_boundary)
+                {
+                  print("Destroyed tail");
+                  Destroy(longBeats[i]);
+                  longBeats[i] = null;
+                }
+              } else
+              {
+                Destroy(longBeats[i]);
+                longBeats[i] = null;
               }
 
               if (beats[i].Count == 0) break;
@@ -253,7 +271,7 @@ public class spawnBeat : MonoBehaviour
                 // spawn((float)beat_spawn_x1);
 
                 // spawn a new beat at a random lane (for testing)
-                spawn(UnityEngine.Random.Range(0,4), true, 3);
+                spawn(UnityEngine.Random.Range(0,4), true, 3f);
             }
         }
 

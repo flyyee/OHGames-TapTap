@@ -25,7 +25,7 @@ public class beat : MonoBehaviour
         return speed;
     }
 
-    public void setTail(GameObject t, int tailLength = 0)
+    public void setTail(GameObject t, float tailLength = 0f)
     {
       hasTail = true;
       beatTail = t;
@@ -78,9 +78,4 @@ public class beat : MonoBehaviour
         //   gameObject.transform.position.z
         // );
     }
-
-    // void onDestroy()
-    // {
-    //   Destroy(bar);
-    // }
 }

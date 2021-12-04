@@ -8,7 +8,7 @@ public class spot : MonoBehaviour
 {
     public Rigidbody2D rb;
     GameObject cam;
-    bool longBeatPressed = false;
+    // bool longBeatPressed = false;
     public int spotNo;
 
     // Start is called before the first frame update
@@ -59,6 +59,15 @@ public class spot : MonoBehaviour
                 float distance = Math.Abs(beat.transform.position.y - rb.position.y);
                 if (distance < 1) // award points if disk is somewhat touching the spot
                 {
+                  beat beat_script = beat.GetComponent<beat>();
+                  if (beat_script.hasTail)
+                  {
+                    GameObject tail = beat_script.getTail();
+                    cam_script.longBeats[spotNo-1] = tail;
+                    tail tail_script = tail.GetComponent<tail>();
+                    tail_script.fading = true;
+                    tail_script.spoty = rb.position.y;
+                  }
                   accuracyScoreAdd = 10*(1-distance); // or 10/distance, or anything else
                   // +1 to streak (maybe in spawnBeat code, see comment below)
                   if (distance < 0.25)
