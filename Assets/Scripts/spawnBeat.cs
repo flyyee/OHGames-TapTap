@@ -35,6 +35,8 @@ public class spawnBeat : MonoBehaviour
     static readonly string[] input_asdf = {"a", "s", "d", "f"};
     static readonly string[] input_hjkl = {"h", "j", "k", "l"};
     public GameObject[] longBeats = {null, null, null, null};
+    // int long_beat_count = 0;
+    const float long_beat_prob = 0.1f;
 
     public float currScore = 0;
     public int currStreak = 0;
@@ -97,6 +99,8 @@ public class spawnBeat : MonoBehaviour
         {
           GameObject t = Instantiate(tailPrefab) as GameObject;
           beat_script.setTail(t, tailLength);
+          // longBeats[lane] = t;
+          // long_beat_count++;
         }
 
         beats[lane].Add(b);
@@ -136,53 +140,6 @@ public class spawnBeat : MonoBehaviour
             m_ToggleChange = false;
         }
 
-        // while (beats.Count > 0)
-        // {
-        //     // Check for keypresses for spots
-        //     // 1st spot – a/h; 2nd spot – s/j; 3rd spot – d/k; 4th spot – f/l
-        //     if (Input.GetKeyDown("a") || Input.GetKeyDown("h"))
-        //     {
-        //       GameObject spot = GameObject.Find("spot1");
-        //       spot.GetComponent<spot>().tapResponse();
-        //     }
-        //     if (Input.GetKeyDown("s") || Input.GetKeyDown("j"))
-        //     {
-        //       GameObject spot = GameObject.Find("spot2");
-        //       spot.GetComponent<spot>().tapResponse();
-        //     }
-        //     if (Input.GetKeyDown("d") || Input.GetKeyDown("k"))
-        //     {
-        //       GameObject spot = GameObject.Find("spot3");
-        //       spot.GetComponent<spot>().tapResponse();
-        //     }
-        //     if (Input.GetKeyDown("f") || Input.GetKeyDown("l"))
-        //     {
-        //       GameObject spot = GameObject.Find("spot4");
-        //       spot.GetComponent<spot>().tapResponse();
-        //     }
-        //
-        //     //beat sc = beats[0].GetComponent<beat>();
-        //     //sc.setSpeed(40);
-        //     if (beats[0].transform.position.y < beats_boundary)
-        //     {
-        //         beat beat_script = beats[0].GetComponent<beat>();
-        //         if (beat_script.hasTail) {
-        //           Destroy(beat_script.getTail());
-        //         }
-        //         Destroy(beats[0]); // TODO: replace with beats falling animation
-        //         beats.RemoveAt(0);
-        //         if (currScore != 0 && currStreak != 0)
-        //         {
-        //           // Combo: x2 for streak of >20, x3 for streak of >30, x4 for streak of >40, x5 for streak of >50
-        //           // if score is -ve it'll be divided
-        //           currScore *= Mathf.Pow(Mathf.Min(currStreak/10+1, 5), currScore/Math.Abs(currScore));
-        //         }
-        //         currStreak = 0;
-        //     } else
-        //     {
-        //         break;
-        //     }
-        // }
         for (int i = 0; i < 4; i++)
         {
           GameObject spot = GameObject.Find("spot" + (i+1).ToString());
@@ -198,16 +155,17 @@ public class spawnBeat : MonoBehaviour
               // probably can improve this logic lol
               if (longBeats[i] != null && (Input.GetKey(input_asdf[i]) || Input.GetKey(input_hjkl[i])))
               {
-                currScore++; // this one will be called a lot so the increase shld be enough lol
+                currScore++; // TODO: refine points accumulation for long beats
                 tail tail_script = longBeats[i].GetComponent<tail>();
                 if (tail_script.length < 1 || longBeats[i].transform.position.y < beats_boundary)
                 {
-                  print("Destroyed tail");
                   Destroy(longBeats[i]);
                   longBeats[i] = null;
+                  // long_beat_count--;
                 }
               } else
               {
+                // if (longBeats[i]) long_beat_count--;
                 Destroy(longBeats[i]);
                 longBeats[i] = null;
               }
@@ -223,7 +181,8 @@ public class spawnBeat : MonoBehaviour
                   {
                     Destroy(beat_script.getTail());
                   }
-                  Destroy(beats[i][0]); // TODO: replace with beats falling animation
+                  // Destroy(beats[i][0]); // TODO: replace with beats falling animation
+                  StartCoroutine(FallingBeats(beats[i][0]));
                   beats[i].RemoveAt(0);
                   if (currScore != 0 && currStreak != 0)
                   {
@@ -271,7 +230,20 @@ public class spawnBeat : MonoBehaviour
                 // spawn((float)beat_spawn_x1);
 
                 // spawn a new beat at a random lane (for testing)
-                spawn(UnityEngine.Random.Range(0,4), true, 3f);
+
+
+                int next_lane = UnityEngine.Random.Range(0,4);
+                // if (long_beat_count < 4)
+                // {
+                  // print("free lane exists!" + long_beat_count);
+                //   while (longBeats[next_lane]) next_lane = UnityEngine.Random.Range(0,4);
+                // }
+
+                spawn(
+                  next_lane,
+                  Mathf.Floor(UnityEngine.Random.Range(0, 1/long_beat_prob)) == 0,
+                  UnityEngine.Random.Range(2,5)
+                );
             }
         }
 
@@ -317,8 +289,15 @@ public class spawnBeat : MonoBehaviour
         }
     }
 
-    // public IEnumerator FallingBeats()
-    // {
-    //   // later lol
-    // }
+    public IEnumerator FallingBeats(GameObject b, float lag = 0.05f)
+    {
+      int i = 0;
+      while (b.transform.localScale.x > 0)
+      {
+        b.transform.localScale = new Vector3(b.transform.localScale.x - i*0.1f, b.transform.localScale.y - i*0.1f, b.transform.localScale.z);
+        i++;
+        yield return new WaitForSeconds(lag);
+      }
+      Destroy(b);
+    }
 }

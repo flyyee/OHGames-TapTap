@@ -88,9 +88,6 @@ public class spot : MonoBehaviour
 
                 } else // disk is not touching the spot
                 {
-                  // undo streak (& add the score from the streak)
-                  // maybe in spawnBeat code, since zero or negative scores would undo the streak while positive scores add to the streak
-
                   // deduct points
                   accuracyScoreAdd = -5;
                   // deduct from streak (if >0)
