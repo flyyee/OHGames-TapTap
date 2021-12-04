@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class spawnBeat : MonoBehaviour
 {
@@ -195,8 +196,16 @@ public class spawnBeat : MonoBehaviour
         //    spawn((float)-3.9);
         //}
 
-        if (!audioSource.isPlaying) {
-          // next level
+        if (game_started && !audioSource.isPlaying)
+        {
+          if (currScore != 0 && currStreak != 0)
+          {
+            // Combo: x2 for streak of >20, x3 for streak of >30, x4 for streak of >40, x5 for streak of >50
+            // if score is -ve it'll be divided
+            currScore *= Mathf.Pow(Mathf.Min(currStreak/10+1, 5), currScore/Math.Abs(currScore));
+          }
+          PlayerPrefs.SetFloat("GameScore", currScore);
+          SceneManager.LoadScene("EndingScreen");
         }
     }
 
