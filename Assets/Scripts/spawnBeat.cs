@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 public class spawnBeat : MonoBehaviour
 {
     bool game_started = false;
+    bool game_ready = false; // prevents game from going straight to end screen after countdown
 
     AudioSource audioSource;
     bool m_Play;
@@ -38,11 +39,15 @@ public class spawnBeat : MonoBehaviour
     // int long_beat_count = 0;
     const float long_beat_prob = 0.1f;
 
-    public float currScore = 0;
-    public int currStreak = 0;
+    public float curr_score = 0;
+    public int curr_streak = 0;
+    const int max_streak = 50;
+    const float bar_height = 6.8f;
     public Text DispScore;
     public Text DispStreak;
     public Text Perfect;
+    public Text CountdownText;
+    public bool counting_down = false;
     public bool perfect_on = false;
     public float perfect_timer = 0;
     const float perfect_maxtime = 3;
@@ -67,22 +72,10 @@ public class spawnBeat : MonoBehaviour
 
         DispScore.text = "Game Score: 0";
         Perfect.color = new Color(Perfect.color.r, Perfect.color.g, Perfect.color.b, 0);
+        CountdownText.text = "";
         //Perfect.enabled = false;
         //next_spawn_time = 0;
     }
-
-    // private void spawn(float x, float y = beat_spawn_y, float z = 0)
-    // {
-    //     GameObject b = Instantiate(beatPrefab) as GameObject;
-    //     beat beat_script = b.GetComponent<beat>();
-    //     beat_script.setSpeed(beat_base_speed);
-    //     Vector3 pos;
-    //     pos.x = (float)x;
-    //     pos.y = y;
-    //     pos.z = z;
-    //     b.transform.position = pos;
-    //     beats.Add(b);
-    // }
 
     private void spawn(int lane, bool hasTail = false, float tailLength = 0f)
     {
@@ -106,10 +99,27 @@ public class spawnBeat : MonoBehaviour
         beats[lane].Add(b);
     }
 
+    public void dispCombo(int streak)
+    {
+      float streak_height = bar_height/50f * streak;
+      GameObject comboBar = GameObject.Find("ComboBarFiller");
+
+      Vector3 new_pos = comboBar.transform.position;
+      new_pos.y = streak_height/2 - 3.4f;
+      comboBar.transform.position = new_pos;
+
+      Vector3 new_scale = comboBar.transform.localScale;
+      new_scale.y = streak_height;
+      comboBar.transform.localScale = new_scale;
+
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && !game_started)
+        if (!counting_down) StartCoroutine(StartingCountdown());
+
+        if (game_ready && !game_started)
         {
             game_started = true;
             m_ToggleChange = true;
@@ -152,10 +162,10 @@ public class spawnBeat : MonoBehaviour
                 spot.GetComponent<spot>().tapResponse();
               }
 
-              // probably can improve this logic lol
+              // probably can improve this logic lol + some long beats not deleted
               if (longBeats[i] != null && (Input.GetKey(input_asdf[i]) || Input.GetKey(input_hjkl[i])))
               {
-                currScore++; // TODO: refine points accumulation for long beats
+                curr_score++; // TODO: refine points accumulation for long beats
                 tail tail_script = longBeats[i].GetComponent<tail>();
                 if (tail_script.length < 1 || longBeats[i].transform.position.y < beats_boundary)
                 {
@@ -184,13 +194,13 @@ public class spawnBeat : MonoBehaviour
                   // Destroy(beats[i][0]); // TODO: replace with beats falling animation
                   StartCoroutine(FallingBeats(beats[i][0]));
                   beats[i].RemoveAt(0);
-                  if (currScore != 0 && currStreak != 0)
+                  if (curr_score != 0 && curr_streak != 0)
                   {
                     // Combo: x2 for streak of >20, x3 for streak of >30, x4 for streak of >40, x5 for streak of >50
                     // if score is -ve it'll be divided
-                    currScore *= Mathf.Pow(Mathf.Min(currStreak/10+1, 5), currScore/Math.Abs(currScore));
+                    curr_score *= Mathf.Pow(Mathf.Min(curr_streak/10+1, 5), curr_score/Math.Abs(curr_score));
                   }
-                  currStreak = 0;
+                  curr_streak = 0; // TODO: uncomment me
               } else
               {
                   break;
@@ -198,14 +208,10 @@ public class spawnBeat : MonoBehaviour
           }
         }
 
-        // Keep track of game score & streak
-        DispScore.text = "Game Score: " + currScore.ToString("0.00");
-        if (currStreak > 0) {
-          DispStreak.text = "Streak: " + currStreak.ToString();
-        } else
-        {
-          DispStreak.text = "Streak: ";
-        }
+        // Keep track of game score, streak & combo bar
+        DispScore.text = "Game Score: " + curr_score.ToString("0.00");
+        DispStreak.text = "Streak: " + curr_streak.ToString();
+        dispCombo(Mathf.Min(curr_streak, max_streak));
 
         // Display perfect
         if (perfect_on)
@@ -258,15 +264,27 @@ public class spawnBeat : MonoBehaviour
 
         if (game_started && !audioSource.isPlaying)
         {
-          if (currScore != 0 && currStreak != 0)
+          if (curr_score != 0 && curr_streak != 0)
           {
             // Combo: x2 for streak of >20, x3 for streak of >30, x4 for streak of >40, x5 for streak of >50
             // if score is -ve it'll be divided
-            currScore *= Mathf.Pow(Mathf.Min(currStreak/10+1, 5), currScore/Math.Abs(currScore));
+            curr_score *= Mathf.Pow(Mathf.Min(curr_streak/10+1, 5), curr_score/Math.Abs(curr_score));
           }
-          PlayerPrefs.SetFloat("GameScore", currScore);
+          PlayerPrefs.SetFloat("GameScore", curr_score);
           SceneManager.LoadScene("EndingScreen");
         }
+    }
+
+    public IEnumerator StartingCountdown(float lag = 1f)
+    {
+      counting_down = true;
+      for (int i = 3; i > 0; i--)
+      {
+        CountdownText.text = i.ToString();
+        yield return new WaitForSeconds(lag);
+      }
+      CountdownText.text = "";
+      game_ready = true;
     }
 
     public IEnumerator FadeTextToFullAlpha(float t, Text i)

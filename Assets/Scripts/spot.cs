@@ -79,7 +79,7 @@ public class spot : MonoBehaviour
                   }
 
                   // add to streak
-                  cam_script.currStreak++;
+                  cam_script.curr_streak++;
 
                   // remove the beat
                   Destroy(beat);
@@ -91,9 +91,9 @@ public class spot : MonoBehaviour
                   // deduct points
                   accuracyScoreAdd = -5;
                   // deduct from streak (if >0)
-                  if (cam_script.currStreak > 0)
+                  if (cam_script.curr_streak > 0)
                   {
-                    cam_script.currStreak--;
+                    cam_script.curr_streak--;
                   }
                 }
                 // float accuracyScoreAdd = 10 / distance;
@@ -105,7 +105,7 @@ public class spot : MonoBehaviour
                 // TODO: if the player does not manage to tap the beat before it gets destroyed at the spot, subtract points
                 // print("Add score:" + accuracyScoreAdd.ToString("0.00"));
             }
-            cam_script.currScore += accuracyScoreAdd;
+            cam_script.curr_score += accuracyScoreAdd;
         }
         catch (NullReferenceException err)
         {
