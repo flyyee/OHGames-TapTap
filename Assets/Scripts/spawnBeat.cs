@@ -30,8 +30,14 @@ public class spawnBeat : MonoBehaviour
     const float beat_spawn_y = 4;
     const float beat_base_speed = 4;
 
-    float currScore = 0;
+    public float currScore = 0;
+    public int currStreak = 0;
     public Text DispScore;
+    public Text DispStreak;
+    public Text Perfect;
+    public bool perfect_on = false;
+    public float perfect_timer = 0;
+    const float perfect_maxtime = 3;
 
     // Start is called before the first frame update
     void Start()
@@ -48,7 +54,8 @@ public class spawnBeat : MonoBehaviour
         beats_boundary = spot.transform.position.y;
 
         DispScore.text = "Game Score: 0";
-
+        Perfect.color = new Color(Perfect.color.r, Perfect.color.g, Perfect.color.b, 0);
+        //Perfect.enabled = false;
         //next_spawn_time = 0;
     }
 
@@ -102,26 +109,26 @@ public class spawnBeat : MonoBehaviour
         while (beats.Count > 0)
         {
             // Check for keypresses for spots
-            // 1st spot – a/left; 2nd spot – w/up; 3rd spot – s/down; 4th spot – d/right
-            if (Input.GetKeyDown("a") || Input.GetKeyDown("left"))
+            // 1st spot – a/h; 2nd spot – s/j; 3rd spot – d/k; 4th spot – f/l
+            if (Input.GetKeyDown("a") || Input.GetKeyDown("h"))
             {
               GameObject spot = GameObject.Find("spot1");
-              currScore += spot.GetComponent<spot>().tapResponse();
+              spot.GetComponent<spot>().tapResponse();
             }
-            if (Input.GetKeyDown("w") || Input.GetKeyDown("up"))
+            if (Input.GetKeyDown("s") || Input.GetKeyDown("j"))
             {
               GameObject spot = GameObject.Find("spot2");
-              currScore += spot.GetComponent<spot>().tapResponse();
+              spot.GetComponent<spot>().tapResponse();
             }
-            if (Input.GetKeyDown("s") || Input.GetKeyDown("down"))
+            if (Input.GetKeyDown("d") || Input.GetKeyDown("k"))
             {
               GameObject spot = GameObject.Find("spot3");
-              currScore += spot.GetComponent<spot>().tapResponse();
+              spot.GetComponent<spot>().tapResponse();
             }
-            if (Input.GetKeyDown("d") || Input.GetKeyDown("right"))
+            if (Input.GetKeyDown("f") || Input.GetKeyDown("l"))
             {
               GameObject spot = GameObject.Find("spot4");
-              currScore += spot.GetComponent<spot>().tapResponse();
+              spot.GetComponent<spot>().tapResponse();
             }
 
             //beat sc = beats[0].GetComponent<beat>();
@@ -130,14 +137,39 @@ public class spawnBeat : MonoBehaviour
             {
                 Destroy(beats[0]); // TODO: replace with beats falling animation
                 beats.RemoveAt(0);
+                if (currScore != 0 && currStreak != 0)
+                {
+                  // Combo: x2 for streak of >20, x3 for streak of >30, x4 for streak of >40, x5 for streak of >50
+                  // if score is -ve it'll be divided
+                  currScore *= Mathf.Pow(Mathf.Min(currStreak/10+1, 5), currScore/Math.Abs(currScore));
+                }
+                currStreak = 0;
             } else
             {
                 break;
             }
         }
 
-        // Keep track of game score
+        // Keep track of game score & streak
         DispScore.text = "Game Score: " + currScore.ToString("0.00");
+        if (currStreak > 0) {
+          DispStreak.text = "Streak: " + currStreak.ToString();
+        } else
+        {
+          DispStreak.text = "Streak: ";
+        }
+
+        // Display perfect
+        if (perfect_on)
+        {
+          perfect_timer += Time.deltaTime;
+          if (perfect_timer > perfect_maxtime)
+          {
+            StartCoroutine(FadeTextToZeroAlpha(1f, Perfect));
+            perfect_on = false;
+            perfect_timer = 0;
+          }
+        }
 
         //print(time_elapsed);
         time_elapsed += Time.deltaTime; // TODO: is this efficient?
@@ -162,5 +194,29 @@ public class spawnBeat : MonoBehaviour
         //    next_spawn_time = Time.time + (float)(60.0 / 130.0);
         //    spawn((float)-3.9);
         //}
+
+        if (!audioSource.isPlaying) {
+          // next level
+        }
+    }
+
+    public IEnumerator FadeTextToFullAlpha(float t, Text i)
+    {
+        i.color = new Color(i.color.r, i.color.g, i.color.b, 0);
+        while (i.color.a < 1.0f)
+        {
+            i.color = new Color(i.color.r, i.color.g, i.color.b, i.color.a + (Time.deltaTime / t));
+            yield return null;
+        }
+    }
+
+    public IEnumerator FadeTextToZeroAlpha(float t, Text i)
+    {
+        i.color = new Color(i.color.r, i.color.g, i.color.b, 1);
+        while (i.color.a > 0.0f)
+        {
+            i.color = new Color(i.color.r, i.color.g, i.color.b, i.color.a - (Time.deltaTime / t));
+            yield return null;
+        }
     }
 }

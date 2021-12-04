@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class spot : MonoBehaviour
 {
@@ -46,7 +47,7 @@ public class spot : MonoBehaviour
     //     }
     // }
 
-    public float tapResponse()
+    public void tapResponse()
     {
         float accuracyScoreAdd = (float)0;
         try
@@ -65,14 +66,29 @@ public class spot : MonoBehaviour
                   {
                     // perfect score – give a high score
                     accuracyScoreAdd = 50;
+                    cam_script.perfect_on = true;
+                    StartCoroutine(cam_script.FadeTextToFullAlpha(0.5f, cam_script.Perfect));
                   }
+
+                  // add to streak
+                  cam_script.currStreak++;
+
+                  // remove the beat
+                  Destroy(beat); // TODO: replace with beats falling animation
+                  cam_script.beats.RemoveAt(0);
+
                 } else // disk is not touching the spot
                 {
                   // undo streak (& add the score from the streak)
                   // maybe in spawnBeat code, since zero or negative scores would undo the streak while positive scores add to the streak
 
-                  // also gotta consider if we wanna deduct points
-
+                  // deduct points
+                  accuracyScoreAdd = -5;
+                  // deduct from streak (if >0)
+                  if (cam_script.currStreak > 0)
+                  {
+                    cam_script.currStreak--;
+                  }
                 }
                 // float accuracyScoreAdd = 10 / distance;
 
@@ -83,11 +99,12 @@ public class spot : MonoBehaviour
                 // TODO: if the player does not manage to tap the beat before it gets destroyed at the spot, subtract points
                 // print("Add score:" + accuracyScoreAdd.ToString("0.00"));
             }
+            cam_script.currScore += accuracyScoreAdd;
         }
         catch (NullReferenceException err)
         {
             // beat gameobject has been destroyed, aka out of frame
         }
-        return accuracyScoreAdd;
+        // return accuracyScoreAdd;
     }
 }
