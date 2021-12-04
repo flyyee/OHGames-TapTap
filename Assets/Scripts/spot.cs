@@ -8,8 +8,8 @@ public class spot : MonoBehaviour
 {
     public Rigidbody2D rb;
     GameObject cam;
-
-    bool x1_check, x2_check, x3_check, x4_check;
+    bool longBeatPressed = false;
+    public int spotNo;
 
     // Start is called before the first frame update
     void Start()
@@ -53,10 +53,9 @@ public class spot : MonoBehaviour
         try
         {
             spawnBeat cam_script = cam.GetComponent<spawnBeat>();
-            if (cam_script.beats.Count > 0)
+            if (cam_script.beats[spotNo-1].Count > 0)
             {
-                GameObject beat = cam_script.beats[0];
-                //GameObject beat = GameObject.Find("Beat");
+                GameObject beat = cam_script.beats[spotNo-1][0];
                 float distance = Math.Abs(beat.transform.position.y - rb.position.y);
                 if (distance < 1) // award points if disk is somewhat touching the spot
                 {
@@ -74,8 +73,9 @@ public class spot : MonoBehaviour
                   cam_script.currStreak++;
 
                   // remove the beat
-                  Destroy(beat); // TODO: replace with beats falling animation
-                  cam_script.beats.RemoveAt(0);
+                  Destroy(beat);
+                  cam_script.beats[spotNo-1].RemoveAt(0);
+                  // print("removal fine, beats left in lane " + spotNo.ToString() + ": " + cam_script.beats[spotNo-1].Count.ToString());
 
                 } else // disk is not touching the spot
                 {
