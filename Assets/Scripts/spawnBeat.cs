@@ -33,6 +33,8 @@ public class spawnBeat : MonoBehaviour
     const float beat_spawn_y = 4;
     const float beat_base_speed = 4;
 
+    public Color col_white = new Color(1, 1, 1);
+    public Color col_dblue = new Color(49, 77, 121);
     static readonly string[] input_asdf = {"a", "s", "d", "f"};
     static readonly string[] input_hjkl = {"h", "j", "k", "l"};
     public GameObject[] longBeats = {null, null, null, null};
@@ -41,7 +43,9 @@ public class spawnBeat : MonoBehaviour
 
     public float curr_score = 0;
     public int curr_streak = 0;
-    const int max_streak = 50;
+    const int x2_streak = 20;
+    const int x3_streak = 50;
+    public int curr_combo = 1;
     const float bar_height = 6.8f;
     public Text DispScore;
     public Text DispStreak;
@@ -150,34 +154,44 @@ public class spawnBeat : MonoBehaviour
             m_ToggleChange = false;
         }
 
+        // Check the combo
+        curr_combo = 1 + Convert.ToInt32(curr_streak >= x2_streak) + Convert.ToInt32(curr_streak >= x3_streak);
+
+        // Handle beats for each lane individually
         for (int i = 0; i < 4; i++)
         {
           GameObject spot = GameObject.Find("spot" + (i+1).ToString());
+          spot spot_script = spot.GetComponent<spot>();
+          bool keydown = Input.GetKey(input_asdf[i]) || Input.GetKey(input_hjkl[i]);
+          // spot.GetComponent<Renderer>().material.color = keydown? col_white : col_dblue;
+          spot_script.spotTapFill.transform.localScale = keydown? new Vector3(1,1,1) : new Vector3(0,0,0);
           while (beats[i].Count > 0)
           {
               // Check for keypresses for spots
               // 1st spot – a/h; 2nd spot – s/j; 3rd spot – d/k; 4th spot – f/l
               if (Input.GetKeyDown(input_asdf[i]) || Input.GetKeyDown(input_hjkl[i]))
               {
-                spot.GetComponent<spot>().tapResponse();
+                spot_script.tapResponse();
               }
 
-              // probably can improve this logic lol + some long beats not deleted
-              if (longBeats[i] != null && (Input.GetKey(input_asdf[i]) || Input.GetKey(input_hjkl[i])))
+              // Handle long beats
+              if (longBeats[i])
               {
-                curr_score++; // TODO: refine points accumulation for long beats
                 tail tail_script = longBeats[i].GetComponent<tail>();
-                if (tail_script.length < 1 || longBeats[i].transform.position.y < beats_boundary)
+                if (keydown)
                 {
+                  curr_score += curr_combo;
+                } else
+                {
+                  // TODO: some long beats not deleted
+                  // currently seems like this part of the code runs late for some of the long beats
+                  // but it still runs eventually
+
+                  // print("Destroying long beat");
+                  tail_script.fading = false;
                   Destroy(longBeats[i]);
                   longBeats[i] = null;
-                  // long_beat_count--;
                 }
-              } else
-              {
-                // if (longBeats[i]) long_beat_count--;
-                Destroy(longBeats[i]);
-                longBeats[i] = null;
               }
 
               if (beats[i].Count == 0) break;
@@ -194,13 +208,7 @@ public class spawnBeat : MonoBehaviour
                   // Destroy(beats[i][0]); // TODO: replace with beats falling animation
                   StartCoroutine(FallingBeats(beats[i][0]));
                   beats[i].RemoveAt(0);
-                  if (curr_score != 0 && curr_streak != 0)
-                  {
-                    // Combo: x2 for streak of >20, x3 for streak of >30, x4 for streak of >40, x5 for streak of >50
-                    // if score is -ve it'll be divided
-                    curr_score *= Mathf.Pow(Mathf.Min(curr_streak/10+1, 5), curr_score/Math.Abs(curr_score));
-                  }
-                  curr_streak = 0; // TODO: uncomment me
+                  curr_streak = 0;
               } else
               {
                   break;
@@ -211,7 +219,7 @@ public class spawnBeat : MonoBehaviour
         // Keep track of game score, streak & combo bar
         DispScore.text = "Game Score: " + curr_score.ToString("0.00");
         DispStreak.text = "Streak: " + curr_streak.ToString();
-        dispCombo(Mathf.Min(curr_streak, max_streak));
+        dispCombo(Mathf.Min(curr_streak, x3_streak));
 
         // Display perfect
         if (perfect_on)
@@ -225,25 +233,14 @@ public class spawnBeat : MonoBehaviour
           }
         }
 
-        //print(time_elapsed);
+        // Beat timing
         time_elapsed += Time.deltaTime; // TODO: is this efficient?
         if (current_timing_idx < timings.Length)
         {
             if (time_elapsed > timings[current_timing_idx])
             {
                 current_timing_idx++;
-                // spawn a new beat!
-                // spawn((float)beat_spawn_x1);
-
-                // spawn a new beat at a random lane (for testing)
-
-
                 int next_lane = UnityEngine.Random.Range(0,4);
-                // if (long_beat_count < 4)
-                // {
-                  // print("free lane exists!" + long_beat_count);
-                //   while (longBeats[next_lane]) next_lane = UnityEngine.Random.Range(0,4);
-                // }
 
                 spawn(
                   next_lane,
@@ -262,14 +259,9 @@ public class spawnBeat : MonoBehaviour
         //    spawn((float)-3.9);
         //}
 
+        // Check for end of game
         if (game_started && !audioSource.isPlaying)
         {
-          if (curr_score != 0 && curr_streak != 0)
-          {
-            // Combo: x2 for streak of >20, x3 for streak of >30, x4 for streak of >40, x5 for streak of >50
-            // if score is -ve it'll be divided
-            curr_score *= Mathf.Pow(Mathf.Min(curr_streak/10+1, 5), curr_score/Math.Abs(curr_score));
-          }
           PlayerPrefs.SetFloat("GameScore", curr_score);
           SceneManager.LoadScene("EndingScreen");
         }

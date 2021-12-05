@@ -8,6 +8,7 @@ public class spot : MonoBehaviour
 {
     public Rigidbody2D rb;
     GameObject cam;
+    public GameObject spotTapFill;
     // bool longBeatPressed = false;
     public int spotNo;
 
@@ -57,23 +58,28 @@ public class spot : MonoBehaviour
             {
                 GameObject beat = cam_script.beats[spotNo-1][0];
                 float distance = Math.Abs(beat.transform.position.y - rb.position.y);
-                if (distance < 1) // award points if disk is somewhat touching the spot
+
+                // award points if beat is somewhat touching spot
+                if (distance < 1)
                 {
                   beat beat_script = beat.GetComponent<beat>();
+
+                  // for longbeats, spawnBeat.cs handles points while tail.cs handles fading
                   if (beat_script.hasTail)
                   {
                     GameObject tail = beat_script.getTail();
                     cam_script.longBeats[spotNo-1] = tail;
+                    // print("Added tail to longbeats");
                     tail tail_script = tail.GetComponent<tail>();
                     tail_script.fading = true;
                     tail_script.spoty = rb.position.y;
                   }
-                  accuracyScoreAdd = 10*(1-distance); // or 10/distance, or anything else
-                  // +1 to streak (maybe in spawnBeat code, see comment below)
+                  accuracyScoreAdd = 10*(1-distance) * cam_script.curr_combo;
+
+                  // if beat is very near the spot then award perfect points (50)
                   if (distance < 0.25)
                   {
-                    // perfect score – give a high score
-                    accuracyScoreAdd = 50;
+                    accuracyScoreAdd = 50 * cam_script.curr_combo;
                     cam_script.perfect_on = true;
                     StartCoroutine(cam_script.FadeTextToFullAlpha(0.5f, cam_script.Perfect));
                   }
@@ -86,7 +92,7 @@ public class spot : MonoBehaviour
                   cam_script.beats[spotNo-1].RemoveAt(0);
                   // print("removal fine, beats left in lane " + spotNo.ToString() + ": " + cam_script.beats[spotNo-1].Count.ToString());
 
-                } else // disk is not touching the spot
+                } else // beat is not touching the spot
                 {
                   // deduct points
                   accuracyScoreAdd = -5;
@@ -96,7 +102,6 @@ public class spot : MonoBehaviour
                     cam_script.curr_streak--;
                   }
                 }
-                // float accuracyScoreAdd = 10 / distance;
 
                 // TODO: formula for calculating score
                 // TODO: to prevent points glitch, prevent spam tapping when the beat is nearing the spot
