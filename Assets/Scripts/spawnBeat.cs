@@ -22,6 +22,7 @@ public class spawnBeat : MonoBehaviour
 
     public GameObject beatPrefab;
     public GameObject tailPrefab;
+    public GameObject darkScreen;
 
     float next_spawn_time;
 
@@ -286,6 +287,7 @@ public class spawnBeat : MonoBehaviour
         yield return new WaitForSeconds(lag);
       }
       CountdownText.text = "";
+      Destroy(darkScreen);
       game_ready = true;
     }
 
