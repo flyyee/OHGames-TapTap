@@ -79,6 +79,9 @@ public class spawnBeat : MonoBehaviour
         CountdownText.text = "";
         //Perfect.enabled = false;
         //next_spawn_time = 0;
+
+        // Set positions of texts relative to screen height & width
+        // setTextPos(DispScore, -0.8f, 0.8f);
     }
 
     private void spawn(int lane, bool hasTail = false, float tailLength = 0f)
@@ -103,7 +106,7 @@ public class spawnBeat : MonoBehaviour
         beats[lane].Add(b);
     }
 
-    public void dispCombo(int streak)
+    private void dispCombo(int streak)
     {
       float streak_height = bar_height/50f * streak;
       GameObject comboBar = GameObject.Find("ComboBarFiller");
@@ -115,8 +118,15 @@ public class spawnBeat : MonoBehaviour
       Vector3 new_scale = comboBar.transform.localScale;
       new_scale.y = streak_height;
       comboBar.transform.localScale = new_scale;
-
     }
+
+    // private void setTextPos(Text txt, float x_rel, float y_rel)
+    // {
+    //   Vector3 new_pos = txt.transform.position;
+    //   new_pos.x = Screen.width/2f * x_rel;
+    //   new_pos.y = Screen.height/2f * y_rel;
+    //   txt.transform.position = new_pos;
+    // }
 
     // Update is called once per frame
     void Update()
