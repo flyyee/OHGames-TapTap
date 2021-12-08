@@ -7,6 +7,8 @@ public class tail : MonoBehaviour
     public float speed;
     public float length;
     public bool fading = false;
+    public bool alive;
+    public int lane;
     public float spoty;
     GameObject cam;
 
@@ -32,6 +34,11 @@ public class tail : MonoBehaviour
       gameObject.transform.localScale = new Vector3(1, length, 1);
     }
 
+    public void setLane(int curr_lane)
+    {
+      lane = curr_lane;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -43,7 +50,8 @@ public class tail : MonoBehaviour
       if (fading)
       {
         float rem_distance = gameObject.transform.position.y-spoty;
-        if (rem_distance > 0)
+        alive = rem_distance > 0;
+        if (alive)
         {
           length = gameObject.transform.localScale.y/2f + rem_distance;
           gameObject.transform.localScale = new Vector3(1, length, 1);

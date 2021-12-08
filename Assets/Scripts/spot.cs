@@ -41,7 +41,7 @@ public class spot : MonoBehaviour
                 {
                   beat beat_script = beat.GetComponent<beat>();
 
-                  // for longbeats, spawnBeat.cs handles points while tail.cs handles fading
+                  // for longbeats, start fading animation & coroutine to accumulate points
                   if (beat_script.hasTail)
                   {
                     GameObject tail = beat_script.getTail();
@@ -50,6 +50,7 @@ public class spot : MonoBehaviour
                     tail tail_script = tail.GetComponent<tail>();
                     tail_script.fading = true;
                     tail_script.spoty = rb.position.y;
+                    StartCoroutine(cam_script.LongBeatsLongPress(tail));
                   }
                   accuracyScoreAdd = 10*(1-distance) * cam_script.curr_combo;
 

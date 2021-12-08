@@ -90,6 +90,7 @@ public class spawnBeat : MonoBehaviour
         GameObject b = Instantiate(beatPrefab) as GameObject;
         beat beat_script = b.GetComponent<beat>();
         beat_script.setSpeed(beat_base_speed);
+        beat_script.setLane(lane);
         Vector3 pos;
         pos.x = (float)beat_spawn_xlist[lane];
         pos.y = beat_spawn_y;
@@ -173,38 +174,18 @@ public class spawnBeat : MonoBehaviour
         {
           GameObject spot = GameObject.Find("spot" + (i+1).ToString());
           spot spot_script = spot.GetComponent<spot>();
+          // 1st spot – a/h; 2nd spot – s/j; 3rd spot – d/k; 4th spot – f/l
           bool keydown = Input.GetKey(input_asdf[i]) || Input.GetKey(input_hjkl[i]);
-          // spot.GetComponent<Renderer>().material.color = keydown? col_white : col_dblue;
           spot_script.spotTapFill.transform.localScale = keydown? new Vector3(1,1,1) : new Vector3(0,0,0);
           while (beats[i].Count > 0)
           {
               // Check for keypresses for spots
-              // 1st spot – a/h; 2nd spot – s/j; 3rd spot – d/k; 4th spot – f/l
               if (Input.GetKeyDown(input_asdf[i]) || Input.GetKeyDown(input_hjkl[i]))
               {
                 spot_script.tapResponse();
               }
 
-              // Handle long beats
-              if (longBeats[i])
-              {
-                tail tail_script = longBeats[i].GetComponent<tail>();
-                if (keydown)
-                {
-                  curr_score += curr_combo;
-                } else
-                {
-                  // TODO: some long beats not deleted
-                  // currently seems like this part of the code runs late for some of the long beats
-                  // but it still runs eventually
-
-                  // print("Destroying long beat");
-                  tail_script.fading = false;
-                  Destroy(longBeats[i]);
-                  longBeats[i] = null;
-                }
-              }
-
+              // if, due to tapResponse(), there is no more beats in the lane, break the loop
               if (beats[i].Count == 0) break;
 
               // beat sc = beats[0].GetComponent<beat>();
@@ -289,6 +270,20 @@ public class spawnBeat : MonoBehaviour
       CountdownText.text = "";
       Destroy(darkScreen);
       game_ready = true;
+    }
+
+    public IEnumerator LongBeatsLongPress(GameObject t, float lag = 0.02f)
+    {
+      tail tail_script = t.GetComponent<tail>();
+      int l = tail_script.lane;
+      while ((Input.GetKey(input_asdf[l]) || Input.GetKey(input_hjkl[l])) && tail_script.alive)
+      {
+        curr_score += curr_combo;
+        yield return new WaitForSeconds(lag);
+      }
+      tail_script.fading = false;
+      Destroy(t);
+      longBeats[l] = null;
     }
 
     public IEnumerator FadeTextToFullAlpha(float t, Text i)
