@@ -196,7 +196,7 @@ public class spawnBeat : MonoBehaviour
       //     //Ensure audio doesn�t play more than once
       //     m_ToggleChange = false;
       // }
-      
+
       // Check the combo
       curr_combo = 1 + Convert.ToInt32(curr_streak >= x2_streak) + Convert.ToInt32(curr_streak >= x3_streak);
 
@@ -208,7 +208,7 @@ public class spawnBeat : MonoBehaviour
         // 1st spot – a/h; 2nd spot – s/j; 3rd spot – d/k; 4th spot – f/l
         bool keydown = Input.GetKey(input_asdf[i]) || Input.GetKey(input_hjkl[i]);
         spot_script.spotTapFill.transform.localScale = keydown? new Vector3(1,1,1) : new Vector3(0,0,0);
-        while (beats[i].Count > 0)
+        while (beats[i].Count > 0 && m_Play)
         {
           // Check for keypresses for spots
           if (Input.GetKeyDown(input_asdf[i]) || Input.GetKeyDown(input_hjkl[i]))
