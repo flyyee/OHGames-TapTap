@@ -12,6 +12,8 @@ public class spawnBeat : MonoBehaviour
 
     AudioSource audioSource;
     public Button Pause;
+    public Button Resume;
+    public Button Exit;
     public bool m_Play;
     // bool m_ToggleChange;
 
@@ -24,6 +26,7 @@ public class spawnBeat : MonoBehaviour
     public GameObject beatPrefab;
     public GameObject tailPrefab;
     public GameObject darkScreen;
+    public GameObject[] pauseObjects;
 
     float next_spawn_time;
 
@@ -59,52 +62,59 @@ public class spawnBeat : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        audioSource = GetComponent<AudioSource>();
-        Button pauseBtn = Pause.GetComponent<Button>();
-        pauseBtn.onClick.AddListener(pauseGame);
-        m_Play = false;
-        // m_ToggleChange = true;
+      audioSource = GetComponent<AudioSource>();
+      Button pauseBtn = Pause.GetComponent<Button>();
+      pauseBtn.onClick.AddListener(pauseGame);
+      Button resumeBtn = Resume.GetComponent<Button>();
+      resumeBtn.onClick.AddListener(resumeGame);
+      Button exitBtn = Exit.GetComponent<Button>();
+      exitBtn.onClick.AddListener(exitGame);
+      m_Play = false;
+      // m_ToggleChange = true;
+      pauseObjects = GameObject.FindGameObjectsWithTag("OnPause");
+	    foreach(GameObject g in pauseObjects) g.SetActive(false);
 
-        timings = new float[0];
-        current_timing_idx = 0;
-        beats = new List<List<GameObject>>();
-        for (int i = 0; i < 4; i++)
-        {
-          beats.Add(new List<GameObject>());
-        }
+      Time.timeScale = 1;
+      timings = new float[0];
+      current_timing_idx = 0;
+      beats = new List<List<GameObject>>();
+      for (int i = 0; i < 4; i++)
+      {
+        beats.Add(new List<GameObject>());
+      }
 
-        GameObject spot = GameObject.Find("spot1");
-        beats_boundary = spot.transform.position.y;
+      GameObject spot = GameObject.Find("spot1");
+      beats_boundary = spot.transform.position.y;
 
-        DispScore.text = "Game Score: 0";
-        Perfect.color = new Color(Perfect.color.r, Perfect.color.g, Perfect.color.b, 0);
-        CountdownText.text = "";
-        //Perfect.enabled = false;
-        //next_spawn_time = 0;
+      DispScore.text = "Game Score: 0";
+      Perfect.color = new Color(Perfect.color.r, Perfect.color.g, Perfect.color.b, 0);
+      CountdownText.text = "";
+      //Perfect.enabled = false;
+      //next_spawn_time = 0;
 
-        // Set positions of texts relative to screen height & width
-        // setTextPos(DispScore, -0.8f, 0.8f);
+      // Set positions of texts relative to screen height & width
+      // setTextPos(DispScore, -0.8f, 0.8f);
     }
 
     private void spawn(int lane, bool hasTail = false, float tailLength = 0f)
     {
-        GameObject b = Instantiate(beatPrefab) as GameObject;
-        beat beat_script = b.GetComponent<beat>();
-        beat_script.setSpeed(beat_base_speed);
-        beat_script.setLane(lane);
-        Vector3 pos;
-        pos.x = (float)beat_spawn_xlist[lane];
-        pos.y = beat_spawn_y;
-        pos.z = 0;
-        b.transform.position = pos;
+      GameObject b = Instantiate(beatPrefab) as GameObject;
+      beat beat_script = b.GetComponent<beat>();
+      beat_script.setSpeed(beat_base_speed);
+      beat_script.setLane(lane);
+      Vector3 pos;
+      pos.x = (float)beat_spawn_xlist[lane];
+      pos.y = beat_spawn_y;
+      pos.z = 0;
+      b.transform.position = pos;
 
-        if (hasTail)
-        {
-          GameObject t = Instantiate(tailPrefab) as GameObject;
-          beat_script.setTail(t, tailLength);
-        }
+      if (hasTail)
+      {
+        GameObject t = Instantiate(tailPrefab) as GameObject;
+        beat_script.setTail(t, tailLength);
+      }
 
-        beats[lane].Add(b);
+      beats[lane].Add(b);
     }
 
     private void dispCombo(int streak)
@@ -131,24 +141,28 @@ public class spawnBeat : MonoBehaviour
 
     private void pauseGame()
     {
-      // currently this button serves both as a pause and play button
-      // actual game it's probably just to pause (basically everything in else)
       if (game_started)
       {
-        m_Play = !m_Play;
-        // m_ToggleChange = true;
-        if (m_Play)
-        {
-          Time.timeScale = 1;
-          audioSource.Play();
-          darkScreen.transform.localScale = new Vector3(0,0,1);
-        } else
-        {
-          Time.timeScale = 0;
-          audioSource.Pause();
-          darkScreen.transform.localScale = new Vector3(100,100,1);
-        }
+        m_Play = false;
+        Time.timeScale = 0;
+        audioSource.Pause();
+        foreach(GameObject g in pauseObjects) g.SetActive(true);
+        // darkScreen.transform.localScale = new Vector3(100,100,1);
       }
+    }
+
+    private void resumeGame()
+    {
+      m_Play = true;
+      Time.timeScale = 1;
+      audioSource.Play();
+      foreach(GameObject g in pauseObjects) g.SetActive(false);
+      // darkScreen.transform.localScale = new Vector3(0,0,1);
+    }
+
+    private void exitGame()
+    {
+      SceneManager.LoadScene("LandingScreen");
     }
 
     // Update is called once per frame
@@ -293,7 +307,8 @@ public class spawnBeat : MonoBehaviour
 
     public IEnumerator StartingCountdown(float lag = 1f)
     {
-      counting_down = true;
+      counting_down = true; print("Starting countdown");
+      darkScreen.SetActive(true);
       audioSource.Stop(); // idk y the audio started playing before the game started, after i added the pause functionality
       for (int i = 3; i > 0; i--)
       {
@@ -301,7 +316,8 @@ public class spawnBeat : MonoBehaviour
         yield return new WaitForSeconds(lag);
       }
       CountdownText.text = "";
-      darkScreen.transform.localScale = new Vector3(0, 0, 1);
+      // darkScreen.transform.localScale = new Vector3(0, 0, 1);
+      darkScreen.SetActive(false);
       game_ready = true;
     }
 
