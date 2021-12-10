@@ -139,10 +139,12 @@ public class spawnBeat : MonoBehaviour
         // m_ToggleChange = true;
         if (m_Play)
         {
+          Time.timeScale = 1;
           audioSource.Play();
           darkScreen.transform.localScale = new Vector3(0,0,1);
         } else
         {
+          Time.timeScale = 0;
           audioSource.Pause();
           darkScreen.transform.localScale = new Vector3(100,100,1);
         }
@@ -194,100 +196,98 @@ public class spawnBeat : MonoBehaviour
       //     //Ensure audio doesn�t play more than once
       //     m_ToggleChange = false;
       // }
-      if (m_Play)
+      
+      // Check the combo
+      curr_combo = 1 + Convert.ToInt32(curr_streak >= x2_streak) + Convert.ToInt32(curr_streak >= x3_streak);
+
+      // Handle beats for each lane individually
+      for (int i = 0; i < 4; i++)
       {
-        // Check the combo
-        curr_combo = 1 + Convert.ToInt32(curr_streak >= x2_streak) + Convert.ToInt32(curr_streak >= x3_streak);
-
-        // Handle beats for each lane individually
-        for (int i = 0; i < 4; i++)
+        GameObject spot = GameObject.Find("spot" + (i+1).ToString());
+        spot spot_script = spot.GetComponent<spot>();
+        // 1st spot – a/h; 2nd spot – s/j; 3rd spot – d/k; 4th spot – f/l
+        bool keydown = Input.GetKey(input_asdf[i]) || Input.GetKey(input_hjkl[i]);
+        spot_script.spotTapFill.transform.localScale = keydown? new Vector3(1,1,1) : new Vector3(0,0,0);
+        while (beats[i].Count > 0)
         {
-          GameObject spot = GameObject.Find("spot" + (i+1).ToString());
-          spot spot_script = spot.GetComponent<spot>();
-          // 1st spot – a/h; 2nd spot – s/j; 3rd spot – d/k; 4th spot – f/l
-          bool keydown = Input.GetKey(input_asdf[i]) || Input.GetKey(input_hjkl[i]);
-          spot_script.spotTapFill.transform.localScale = keydown? new Vector3(1,1,1) : new Vector3(0,0,0);
-          while (beats[i].Count > 0)
+          // Check for keypresses for spots
+          if (Input.GetKeyDown(input_asdf[i]) || Input.GetKeyDown(input_hjkl[i]))
           {
-            // Check for keypresses for spots
-            if (Input.GetKeyDown(input_asdf[i]) || Input.GetKeyDown(input_hjkl[i]))
+            spot_script.tapResponse();
+          }
+
+          // if, due to tapResponse(), there is no more beats in the lane, break the loop
+          if (beats[i].Count == 0) break;
+
+          // beat sc = beats[0].GetComponent<beat>();
+          // sc.setSpeed(40);
+          if (beats[i][0].transform.position.y < beats_boundary)
+          {
+            beat beat_script = beats[i][0].GetComponent<beat>();
+            if (beat_script.hasTail)
             {
-              spot_script.tapResponse();
+              Destroy(beat_script.getTail());
             }
-
-            // if, due to tapResponse(), there is no more beats in the lane, break the loop
-            if (beats[i].Count == 0) break;
-
-            // beat sc = beats[0].GetComponent<beat>();
-            // sc.setSpeed(40);
-            if (beats[i][0].transform.position.y < beats_boundary)
-            {
-              beat beat_script = beats[i][0].GetComponent<beat>();
-              if (beat_script.hasTail)
-              {
-                Destroy(beat_script.getTail());
-              }
-              // Destroy(beats[i][0]); // TODO: replace with beats falling animation
-              StartCoroutine(FallingBeats(beats[i][0]));
-              beats[i].RemoveAt(0);
-              curr_streak = 0;
-            } else
-            {
-              break;
-            }
-          }
-        }
-
-        // Keep track of game score, streak & combo bar
-        DispScore.text = "Game Score: " + curr_score.ToString("0.00");
-        DispStreak.text = "Streak: " + curr_streak.ToString();
-        dispCombo(Mathf.Min(curr_streak, x3_streak));
-
-        // Display perfect
-        if (perfect_on)
-        {
-          perfect_timer += Time.deltaTime;
-          if (perfect_timer > perfect_maxtime)
+            // Destroy(beats[i][0]); // TODO: replace with beats falling animation
+            StartCoroutine(FallingBeats(beats[i][0]));
+            beats[i].RemoveAt(0);
+            curr_streak = 0;
+          } else
           {
-            StartCoroutine(FadeTextToZeroAlpha(1f, Perfect));
-            perfect_on = false;
-            perfect_timer = 0;
+            break;
           }
         }
+      }
 
-        // Beat timing
-        time_elapsed += Time.deltaTime; // TODO: is this efficient?
-        if (current_timing_idx < timings.Length)
+      // Keep track of game score, streak & combo bar
+      DispScore.text = "Game Score: " + curr_score.ToString("0.00");
+      DispStreak.text = "Streak: " + curr_streak.ToString();
+      dispCombo(Mathf.Min(curr_streak, x3_streak));
+
+      // Display perfect
+      if (perfect_on)
+      {
+        perfect_timer += Time.deltaTime;
+        if (perfect_timer > perfect_maxtime)
         {
-          if (time_elapsed > timings[current_timing_idx])
-          {
-            current_timing_idx++;
-            int next_lane = UnityEngine.Random.Range(0,4);
-
-            spawn(
-              next_lane,
-              Mathf.Floor(UnityEngine.Random.Range(0, 1/long_beat_prob)) == 0,
-              UnityEngine.Random.Range(2,5)
-            );
-          }
+          StartCoroutine(FadeTextToZeroAlpha(1f, Perfect));
+          perfect_on = false;
+          perfect_timer = 0;
         }
+      }
 
-        // another beat timing system
-        //if (Time.time > next_spawn_time && next_spawn_time != 0.0)
-        //{
-        //    print(Time.time);
-        //    print(next_spawn_time);
-        //    next_spawn_time = Time.time + (float)(60.0 / 130.0);
-        //    spawn((float)-3.9);
-        //}
-
-        // Check for end of game
-        // When game has started and is still playing but the music has ended
-        if (game_started && !audioSource.isPlaying)
+      // Beat timing
+      time_elapsed += Time.deltaTime; // TODO: is this efficient?
+      if (current_timing_idx < timings.Length)
+      {
+        if (time_elapsed > timings[current_timing_idx])
         {
-          PlayerPrefs.SetFloat("GameScore", curr_score);
-          SceneManager.LoadScene("EndingScreen");
+          current_timing_idx++;
+          int next_lane = UnityEngine.Random.Range(0,4);
+
+          spawn(
+            next_lane,
+            Mathf.Floor(UnityEngine.Random.Range(0, 1/long_beat_prob)) == 0,
+            UnityEngine.Random.Range(2,5)
+          );
         }
+      }
+
+      // another beat timing system
+      //if (Time.time > next_spawn_time && next_spawn_time != 0.0)
+      //{
+      //    print(Time.time);
+      //    print(next_spawn_time);
+      //    next_spawn_time = Time.time + (float)(60.0 / 130.0);
+      //    spawn((float)-3.9);
+      //}
+
+      // Check for end of game
+      // When game has started and is still playing but the music has ended
+      if (game_started && !audioSource.isPlaying && m_Play)
+      {
+        PlayerPrefs.SetFloat("GameScore", curr_score);
+        SceneManager.LoadScene("EndingScreen");
       }
     }
 

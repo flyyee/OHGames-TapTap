@@ -44,22 +44,19 @@ public class tail : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-      if (cam_script.m_Play)
+      Vector3 speedvector;
+      speedvector.x = 0;
+      speedvector.y = -1 * (fading? speed/2 : speed) * Time.deltaTime;
+      speedvector.z = 0;
+      gameObject.transform.position += speedvector;
+      if (fading)
       {
-        Vector3 speedvector;
-        speedvector.x = 0;
-        speedvector.y = -1 * (fading? speed/2 : speed) * Time.deltaTime;
-        speedvector.z = 0;
-        gameObject.transform.position += speedvector;
-        if (fading)
+        float rem_distance = gameObject.transform.position.y-spoty;
+        alive = rem_distance > 0;
+        if (alive)
         {
-          float rem_distance = gameObject.transform.position.y-spoty;
-          alive = rem_distance > 0;
-          if (alive)
-          {
-            length = gameObject.transform.localScale.y/2f + rem_distance;
-            gameObject.transform.localScale = new Vector3(1, length, 1);
-          }
+          length = gameObject.transform.localScale.y/2f + rem_distance;
+          gameObject.transform.localScale = new Vector3(1, length, 1);
         }
       }
     }

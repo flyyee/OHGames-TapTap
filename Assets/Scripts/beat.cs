@@ -64,13 +64,10 @@ public class beat : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-      if (cam_script.m_Play)
-      {
-        Vector3 speedvector;
-        speedvector.x = 0;
-        speedvector.y = -1 * speed * Time.deltaTime;
-        speedvector.z = 0;
-        gameObject.transform.position += speedvector;
-      }
+      Vector3 speedvector;
+      speedvector.x = 0;
+      speedvector.y = -1 * speed * Time.deltaTime;
+      speedvector.z = 0;
+      gameObject.transform.position += speedvector;
     }
 }
