@@ -7,23 +7,27 @@ public class beat : MonoBehaviour
     public float speed;
     public bool hasTail = false;
     public Rigidbody2D rb;
+    GameObject cam;
+    spawnBeat cam_script;
     public GameObject beatTail;
     public int lane;
 
     // Start is called before the first frame update
     void Start()
     {
-        // speed must be assigned in the spawner
+      // speed must be assigned in the spawner
+      cam = GameObject.Find("Main Camera");
+      cam_script = cam.GetComponent<spawnBeat>();
     }
 
     public void setSpeed(float new_speed)
     {
-        speed = new_speed;
+      speed = new_speed;
     }
 
     public float getSpeed()
     {
-        return speed;
+      return speed;
     }
 
     public void setLane(int curr_lane)
@@ -60,10 +64,13 @@ public class beat : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+      if (cam_script.m_Play)
+      {
         Vector3 speedvector;
         speedvector.x = 0;
         speedvector.y = -1 * speed * Time.deltaTime;
         speedvector.z = 0;
         gameObject.transform.position += speedvector;
+      }
     }
 }

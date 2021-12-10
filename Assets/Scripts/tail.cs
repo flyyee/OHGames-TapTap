@@ -11,21 +11,23 @@ public class tail : MonoBehaviour
     public int lane;
     public float spoty;
     GameObject cam;
+    spawnBeat cam_script;
 
     // Start is called before the first frame update
     void Start()
     {
-
+      cam = GameObject.Find("Main Camera");
+      cam_script = cam.GetComponent<spawnBeat>();
     }
 
     public void setSpeed(float new_speed)
     {
-        speed = new_speed;
+      speed = new_speed;
     }
 
     public float getSpeed()
     {
-        return speed;
+      return speed;
     }
 
     public void setLength(float l)
@@ -42,19 +44,22 @@ public class tail : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-      Vector3 speedvector;
-      speedvector.x = 0;
-      speedvector.y = -1 * (fading? speed/2 : speed) * Time.deltaTime;
-      speedvector.z = 0;
-      gameObject.transform.position += speedvector;
-      if (fading)
+      if (cam_script.m_Play)
       {
-        float rem_distance = gameObject.transform.position.y-spoty;
-        alive = rem_distance > 0;
-        if (alive)
+        Vector3 speedvector;
+        speedvector.x = 0;
+        speedvector.y = -1 * (fading? speed/2 : speed) * Time.deltaTime;
+        speedvector.z = 0;
+        gameObject.transform.position += speedvector;
+        if (fading)
         {
-          length = gameObject.transform.localScale.y/2f + rem_distance;
-          gameObject.transform.localScale = new Vector3(1, length, 1);
+          float rem_distance = gameObject.transform.position.y-spoty;
+          alive = rem_distance > 0;
+          if (alive)
+          {
+            length = gameObject.transform.localScale.y/2f + rem_distance;
+            gameObject.transform.localScale = new Vector3(1, length, 1);
+          }
         }
       }
     }

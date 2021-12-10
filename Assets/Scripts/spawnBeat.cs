@@ -11,8 +11,9 @@ public class spawnBeat : MonoBehaviour
     bool game_ready = false; // prevents game from going straight to end screen after countdown
 
     AudioSource audioSource;
-    bool m_Play;
-    bool m_ToggleChange;
+    public Button Pause;
+    public bool m_Play;
+    // bool m_ToggleChange;
 
     float[] timings;
     public int current_timing_idx;
@@ -59,8 +60,10 @@ public class spawnBeat : MonoBehaviour
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
+        Button pauseBtn = Pause.GetComponent<Button>();
+        pauseBtn.onClick.AddListener(pauseGame);
         m_Play = false;
-        m_ToggleChange = true;
+        // m_ToggleChange = true;
 
         timings = new float[0];
         current_timing_idx = 0;
@@ -126,42 +129,73 @@ public class spawnBeat : MonoBehaviour
     //   txt.transform.position = new_pos;
     // }
 
+    private void pauseGame()
+    {
+      // currently this button serves both as a pause and play button
+      // actual game it's probably just to pause (basically everything in else)
+      if (game_started)
+      {
+        m_Play = !m_Play;
+        // m_ToggleChange = true;
+        if (m_Play)
+        {
+          audioSource.Play();
+          darkScreen.transform.localScale = new Vector3(0,0,1);
+        } else
+        {
+          audioSource.Pause();
+          darkScreen.transform.localScale = new Vector3(100,100,1);
+        }
+      }
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (!counting_down) StartCoroutine(StartingCountdown());
+      if (!counting_down) StartCoroutine(StartingCountdown());
 
-        if (game_ready && !game_started)
-        {
-            game_started = true;
-            m_ToggleChange = true;
-            m_Play = !m_Play;
-            timings = new float[500];
-            for (int x = 0; x < 500; x++)
-            {
-                timings[x] = ((x + 6) * (float)(60.0 / 130.0)) + time_elapsed - (Math.Abs(beat_spawn_y - beats_boundary) / beat_base_speed);
-            }
-            //next_spawn_time = Time.time + (60 / 130);
-        }
+      // Logic of the variables here
+      // intitially counting_down, game_ready and game_started are all false
+      // counting_down gets set to true when Coroutine starts, then the game waits for the countdown to finish
+      // game_ready gets set to true after countdown ends, which triggers the game to start
+      // game_started gets set to true after all the stuff in the if statement below has run
+      // so that they won't run on every update loop
+      // additionally this ensures that the game doesn't end prematurely
 
-        //Check to see if you just set the toggle to positive
-        if (m_Play == true && m_ToggleChange == true)
-        {
-            //Play the audio you attach to the AudioSource component
-            audioSource.Play();
-            //Ensure audio doesn�t play more than once
-            m_ToggleChange = false;
-        }
-        // TODO: add pause
-        //Check if you just set the toggle to false
-        if (m_Play == false && m_ToggleChange == true)
-        {
-            //Stop the audio
-            audioSource.Stop();
-            //Ensure audio doesn�t play more than once
-            m_ToggleChange = false;
-        }
+      if (game_ready && !game_started)
+      {
+          game_started = true;
+          // m_ToggleChange = true;
+          m_Play = true;
+          audioSource.Play();
+          timings = new float[500];
+          for (int x = 0; x < 500; x++)
+          {
+              timings[x] = ((x + 6) * (float)(60.0 / 130.0)) + time_elapsed - (Math.Abs(beat_spawn_y - beats_boundary) / beat_base_speed);
+          }
+          //next_spawn_time = Time.time + (60 / 130);
+      }
 
+      // //Check to see if you just set the toggle to positive
+      // if (m_Play == true && m_ToggleChange == true)
+      // {
+      //     //Play the audio you attach to the AudioSource component
+      //     audioSource.Play();
+      //     //Ensure audio doesn�t play more than once
+      //     m_ToggleChange = false;
+      // }
+      // // TODO: add pause
+      //
+      // //Check if you just set the toggle to false
+      // if (m_Play == false && m_ToggleChange == true)
+      // {
+      //     //Stop the audio
+      //     audioSource.Pause();
+      //     //Ensure audio doesn�t play more than once
+      //     m_ToggleChange = false;
+      // }
+      if (m_Play)
+      {
         // Check the combo
         curr_combo = 1 + Convert.ToInt32(curr_streak >= x2_streak) + Convert.ToInt32(curr_streak >= x3_streak);
 
@@ -175,32 +209,32 @@ public class spawnBeat : MonoBehaviour
           spot_script.spotTapFill.transform.localScale = keydown? new Vector3(1,1,1) : new Vector3(0,0,0);
           while (beats[i].Count > 0)
           {
-              // Check for keypresses for spots
-              if (Input.GetKeyDown(input_asdf[i]) || Input.GetKeyDown(input_hjkl[i]))
-              {
-                spot_script.tapResponse();
-              }
+            // Check for keypresses for spots
+            if (Input.GetKeyDown(input_asdf[i]) || Input.GetKeyDown(input_hjkl[i]))
+            {
+              spot_script.tapResponse();
+            }
 
-              // if, due to tapResponse(), there is no more beats in the lane, break the loop
-              if (beats[i].Count == 0) break;
+            // if, due to tapResponse(), there is no more beats in the lane, break the loop
+            if (beats[i].Count == 0) break;
 
-              // beat sc = beats[0].GetComponent<beat>();
-              // sc.setSpeed(40);
-              if (beats[i][0].transform.position.y < beats_boundary)
+            // beat sc = beats[0].GetComponent<beat>();
+            // sc.setSpeed(40);
+            if (beats[i][0].transform.position.y < beats_boundary)
+            {
+              beat beat_script = beats[i][0].GetComponent<beat>();
+              if (beat_script.hasTail)
               {
-                  beat beat_script = beats[i][0].GetComponent<beat>();
-                  if (beat_script.hasTail)
-                  {
-                    Destroy(beat_script.getTail());
-                  }
-                  // Destroy(beats[i][0]); // TODO: replace with beats falling animation
-                  StartCoroutine(FallingBeats(beats[i][0]));
-                  beats[i].RemoveAt(0);
-                  curr_streak = 0;
-              } else
-              {
-                  break;
+                Destroy(beat_script.getTail());
               }
+              // Destroy(beats[i][0]); // TODO: replace with beats falling animation
+              StartCoroutine(FallingBeats(beats[i][0]));
+              beats[i].RemoveAt(0);
+              curr_streak = 0;
+            } else
+            {
+              break;
+            }
           }
         }
 
@@ -225,17 +259,17 @@ public class spawnBeat : MonoBehaviour
         time_elapsed += Time.deltaTime; // TODO: is this efficient?
         if (current_timing_idx < timings.Length)
         {
-            if (time_elapsed > timings[current_timing_idx])
-            {
-                current_timing_idx++;
-                int next_lane = UnityEngine.Random.Range(0,4);
+          if (time_elapsed > timings[current_timing_idx])
+          {
+            current_timing_idx++;
+            int next_lane = UnityEngine.Random.Range(0,4);
 
-                spawn(
-                  next_lane,
-                  Mathf.Floor(UnityEngine.Random.Range(0, 1/long_beat_prob)) == 0,
-                  UnityEngine.Random.Range(2,5)
-                );
-            }
+            spawn(
+              next_lane,
+              Mathf.Floor(UnityEngine.Random.Range(0, 1/long_beat_prob)) == 0,
+              UnityEngine.Random.Range(2,5)
+            );
+          }
         }
 
         // another beat timing system
@@ -248,23 +282,26 @@ public class spawnBeat : MonoBehaviour
         //}
 
         // Check for end of game
+        // When game has started and is still playing but the music has ended
         if (game_started && !audioSource.isPlaying)
         {
           PlayerPrefs.SetFloat("GameScore", curr_score);
           SceneManager.LoadScene("EndingScreen");
         }
+      }
     }
 
     public IEnumerator StartingCountdown(float lag = 1f)
     {
       counting_down = true;
+      audioSource.Stop(); // idk y the audio started playing before the game started, after i added the pause functionality
       for (int i = 3; i > 0; i--)
       {
         CountdownText.text = i.ToString();
         yield return new WaitForSeconds(lag);
       }
       CountdownText.text = "";
-      Destroy(darkScreen);
+      darkScreen.transform.localScale = new Vector3(0, 0, 1);
       game_ready = true;
     }
 
@@ -272,7 +309,10 @@ public class spawnBeat : MonoBehaviour
     {
       tail tail_script = t.GetComponent<tail>();
       int l = tail_script.lane;
-      while ((Input.GetKey(input_asdf[l]) || Input.GetKey(input_hjkl[l])) && tail_script.alive)
+
+      // TODO: currently tails undergoing long press will disappear once game pauses
+      // but not sure if this is something we'll actually need to correct
+      while (m_Play && (Input.GetKey(input_asdf[l]) || Input.GetKey(input_hjkl[l])) && tail_script.alive)
       {
         curr_score += curr_combo;
         yield return new WaitForSeconds(lag);
