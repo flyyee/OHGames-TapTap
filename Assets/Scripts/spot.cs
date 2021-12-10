@@ -45,8 +45,6 @@ public class spot : MonoBehaviour
                   if (beat_script.hasTail)
                   {
                     GameObject tail = beat_script.getTail();
-                    cam_script.longBeats[spotNo-1] = tail;
-                    // print("Added tail to longbeats");
                     tail tail_script = tail.GetComponent<tail>();
                     tail_script.fading = true;
                     tail_script.spoty = rb.position.y;
@@ -59,6 +57,7 @@ public class spot : MonoBehaviour
                   {
                     accuracyScoreAdd = 50 * cam_script.curr_combo;
                     cam_script.perfect_on = true;
+                    cam_script.perfect_timer = 0;
                     StartCoroutine(cam_script.FadeTextToFullAlpha(0.5f, cam_script.Perfect));
                   }
 

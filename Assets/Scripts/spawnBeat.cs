@@ -38,8 +38,6 @@ public class spawnBeat : MonoBehaviour
     public Color col_dblue = new Color(49, 77, 121);
     static readonly string[] input_asdf = {"a", "s", "d", "f"};
     static readonly string[] input_hjkl = {"h", "j", "k", "l"};
-    public GameObject[] longBeats = {null, null, null, null};
-    // int long_beat_count = 0;
     const float long_beat_prob = 0.1f;
 
     public float curr_score = 0;
@@ -101,8 +99,6 @@ public class spawnBeat : MonoBehaviour
         {
           GameObject t = Instantiate(tailPrefab) as GameObject;
           beat_script.setTail(t, tailLength);
-          // longBeats[lane] = t;
-          // long_beat_count++;
         }
 
         beats[lane].Add(b);
@@ -283,7 +279,6 @@ public class spawnBeat : MonoBehaviour
       }
       tail_script.fading = false;
       Destroy(t);
-      longBeats[l] = null;
     }
 
     public IEnumerator FadeTextToFullAlpha(float t, Text i)
