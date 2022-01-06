@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class submitHS : MonoBehaviour
 {
-	const string HOST = "http://localhost:3000/";
+	const string HOST = "https://ohgames.herokuapp.com/"; //"http://localhost:3000/";
 
 	public GameObject HSname;
     // Start is called before the first frame update
