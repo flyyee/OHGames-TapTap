@@ -12,8 +12,11 @@ public class tail : MonoBehaviour
 	public float spoty;
 	GameObject cam;
 	spawnBeat cam_script;
-	const float width = 0.25f;
+	public float width = 0.5f;
 	bool firstFade = true;
+
+	public SpriteRenderer tailRenderer;
+	public Sprite[] ast_tails;
 
 	// Start is called before the first frame update
 	void Start()
@@ -41,6 +44,7 @@ public class tail : MonoBehaviour
 	public void setLane(int curr_lane)
 	{
 		lane = curr_lane;
+		tailRenderer.sprite = ast_tails[curr_lane];
 	}
 
 	// Update is called once per frame
@@ -66,6 +70,7 @@ public class tail : MonoBehaviour
 			{
         float curr_length = length;
         length = Mathf.Min(gameObject.transform.localScale.y / 2f + rem_distance, curr_length);
+				width = length/curr_length * width;
 				gameObject.transform.localScale = new Vector3(width, length, 1);
 			}
 		}

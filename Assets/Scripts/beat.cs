@@ -12,6 +12,9 @@ public class beat : MonoBehaviour
     public GameObject beatTail;
     public int lane;
 
+    public SpriteRenderer beatRenderer;
+    public Sprite[] asteroids;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -33,6 +36,8 @@ public class beat : MonoBehaviour
     public void setLane(int curr_lane)
     {
       lane = curr_lane;
+      beatRenderer.sprite = asteroids[curr_lane];
+
     }
 
     public int getLane()

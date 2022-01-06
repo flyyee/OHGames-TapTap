@@ -100,3 +100,9 @@ MonoBehaviour:
   rb: {fileID: 0}
   beatTail: {fileID: 0}
   lane: 0
+  beatRenderer: {fileID: 1406101639477815191}
+  asteroids:
+  - {fileID: 21300000, guid: d76bd7eb0780a430ba280afb80b6848c, type: 3}
+  - {fileID: 21300000, guid: bb50532f16cc44cab8339c6360d7c90b, type: 3}
+  - {fileID: 21300000, guid: f2ecebe6ea72c48a4b92c0ffede9bab2, type: 3}
+  - {fileID: 21300000, guid: 30cc6c9e7b72b4661a4bb926cb97ccba, type: 3}
