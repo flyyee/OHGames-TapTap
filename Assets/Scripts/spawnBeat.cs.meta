@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 4bb7dc0bffaf0ad4ab3c5d737979117f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - beatTimingFileE: {fileID: 4900000, guid: 58813ce915b83794ab41d8d886917c83, type: 3}
+  - Pause: {instanceID: 0}
+  - Resume: {instanceID: 0}
+  - Exit: {instanceID: 0}
+  - beatPrefab: {instanceID: 0}
+  - tailPrefab: {instanceID: 0}
+  - darkScreen: {instanceID: 0}
+  - DispScore: {instanceID: 0}
+  - DispStreak: {instanceID: 0}
+  - Perfect: {instanceID: 0}
+  - CountdownText: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
