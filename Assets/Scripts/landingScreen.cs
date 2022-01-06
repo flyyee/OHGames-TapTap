@@ -7,8 +7,6 @@ using UnityEngine.SceneManagement;
 public class landingScreen : MonoBehaviour
 {
     public Button startBtn;
-<<<<<<< HEAD
-=======
     public Dropdown songchoices;
 
     void Awake()
@@ -26,7 +24,6 @@ public class landingScreen : MonoBehaviour
         }
     }
 
->>>>>>> 4ce35071c1dfb40ac0a12c082e0a65884e2739f6
     // Start is called before the first frame update
     void Start()
     {
@@ -44,8 +41,6 @@ public class landingScreen : MonoBehaviour
 
     public void startGame()
     {
-<<<<<<< HEAD
-=======
         GameObject canvas = GameObject.Find("Dropdown");
         Dropdown dd = canvas.GetComponent<Dropdown>();
         string choice = dd.options[dd.value].text;
@@ -65,7 +60,6 @@ public class landingScreen : MonoBehaviour
 		{
             PlayerPrefs.SetInt("songchoice", 3); // einstein infinity
         }
->>>>>>> 4ce35071c1dfb40ac0a12c082e0a65884e2739f6
       SceneManager.LoadScene("SampleScene");
     }
 }
