@@ -8,7 +8,7 @@ using System;
 
 public class endingScreen : MonoBehaviour
 {
-	const string HOST = "http://localhost:3000";
+	const string HOST = "http://localhost:3000/";
 
 	public Button PlayAgain;
 	public Button MainMenu;
@@ -67,6 +67,7 @@ public class endingScreen : MonoBehaviour
 		//StartCoroutine(GetRequest(HOST + "/beats/submitscore?myID=" + PlayerPrefs.GetString("myID")
 		//	+ "&myScore=" + PlayerPrefs.GetFloat("myScore").ToString("0"), "GetRank"));
 	}
+
 
 	void Start()
 	{

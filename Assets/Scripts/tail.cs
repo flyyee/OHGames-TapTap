@@ -64,7 +64,8 @@ public class tail : MonoBehaviour
 			alive = rem_distance > 0;
 			if (alive)
 			{
-				length = gameObject.transform.localScale.y / 2f + rem_distance;
+        float curr_length = length;
+        length = Mathf.Min(gameObject.transform.localScale.y / 2f + rem_distance, curr_length);
 				gameObject.transform.localScale = new Vector3(width, length, 1);
 			}
 		}

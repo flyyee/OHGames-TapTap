@@ -6,13 +6,13 @@ using UnityEngine.UI;
 
 public class submitHS : MonoBehaviour
 {
-	const string HOST = "http://localhost:3000";
+	const string HOST = "http://localhost:3000/";
 
 	public GameObject HSname;
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
 	public void sendHS()
@@ -55,6 +55,6 @@ public class submitHS : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
-        
+
     }
 }
