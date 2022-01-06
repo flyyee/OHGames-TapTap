@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - spot
+<<<<<<< HEAD
+=======
+  - OnPause
+>>>>>>> 4ce35071c1dfb40ac0a12c082e0a65884e2739f6
   layers:
   - Default
   - TransparentFX
@@ -39,6 +43,12 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+<<<<<<< HEAD
+=======
+  - name: BG
+    uniqueID: 2765751129
+    locked: 0
+>>>>>>> 4ce35071c1dfb40ac0a12c082e0a65884e2739f6
   - name: Default
     uniqueID: 0
     locked: 0

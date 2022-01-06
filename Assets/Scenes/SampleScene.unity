@@ -728,8 +728,13 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+<<<<<<< HEAD
   m_SortingLayerID: 0
   m_SortingLayer: 0
+=======
+  m_SortingLayerID: -1529216167
+  m_SortingLayer: -1
+>>>>>>> 4ce35071c1dfb40ac0a12c082e0a65884e2739f6
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: ebe73ca9363db456bacf42c025bb4847, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1047,8 +1052,13 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+<<<<<<< HEAD
   m_SortingLayerID: 0
   m_SortingLayer: 0
+=======
+  m_SortingLayerID: -1529216167
+  m_SortingLayer: -1
+>>>>>>> 4ce35071c1dfb40ac0a12c082e0a65884e2739f6
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: ebe73ca9363db456bacf42c025bb4847, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1115,12 +1125,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bb7dc0bffaf0ad4ab3c5d737979117f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< HEAD
+=======
+  beatTimingFileE: {fileID: 4900000, guid: 58813ce915b83794ab41d8d886917c83, type: 3}
+  beatTimingFileD: {fileID: 4900000, guid: 2608ac7ea584dec44939fd2dab035d39, type: 3}
+>>>>>>> 4ce35071c1dfb40ac0a12c082e0a65884e2739f6
   Pause: {fileID: 1736189022}
   Resume: {fileID: 1087805196}
   Exit: {fileID: 604253419}
   m_Play: 0
   current_timing_idx: 0
   time_elapsed: 0
+<<<<<<< HEAD
+=======
+  song_time_elapsed: 0
+>>>>>>> 4ce35071c1dfb40ac0a12c082e0a65884e2739f6
   beats_boundary: 0
   beatPrefab: {fileID: 1406101639477815189, guid: 9b324ac08204e064fa6e41e6c5bbba55, type: 3}
   tailPrefab: {fileID: 7111957278253854312, guid: 286875ad450004306976533153e5df32, type: 3}
@@ -1605,8 +1624,13 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+<<<<<<< HEAD
   m_SortingLayerID: 0
   m_SortingLayer: 0
+=======
+  m_SortingLayerID: -1529216167
+  m_SortingLayer: -1
+>>>>>>> 4ce35071c1dfb40ac0a12c082e0a65884e2739f6
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: ebe73ca9363db456bacf42c025bb4847, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2636,8 +2660,13 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+<<<<<<< HEAD
   m_SortingLayerID: 0
   m_SortingLayer: 0
+=======
+  m_SortingLayerID: -1529216167
+  m_SortingLayer: -1
+>>>>>>> 4ce35071c1dfb40ac0a12c082e0a65884e2739f6
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: ebe73ca9363db456bacf42c025bb4847, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -3264,7 +3293,11 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
+<<<<<<< HEAD
   m_AnchoredPosition: {x: -350, y: 185}
+=======
+  m_AnchoredPosition: {x: 338, y: 119}
+>>>>>>> 4ce35071c1dfb40ac0a12c082e0a65884e2739f6
   m_SizeDelta: {x: 80, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1736189022
