@@ -52,7 +52,7 @@ public class endingScreen : MonoBehaviour
 				+ "&mode=" + PlayerPrefs.GetInt("songchoice").ToString(), "GetRank", "new highscore"));
 			HSName.SetActive(true);
 			HSSubmit.SetActive(true);
-			ScoreText.text = "NEW HIGHSCORE!!!";
+			ScoreText.text = "NEW\nHIGHSCORE!!!";
 		}
 		else
 		{

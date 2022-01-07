@@ -53,10 +53,10 @@ public class spawnBeat : MonoBehaviour
 	public TextAsset beatTimingFileE;
 	public TextAsset beatTimingFileD;
 
-	bool game_started = false;
+	public bool game_started = false;
 	bool game_ready = false; // prevents game from going straight to end screen after countdown
 
-	AudioSource audioSource;
+	public AudioSource audioSource;
 	public Button Pause;
 	public Button Resume;
 	public Button Exit;
@@ -101,7 +101,7 @@ public class spawnBeat : MonoBehaviour
 	public int curr_combo = 1;
 	const float bar_height = 6.8f;
 	public Text DispScore;
-	public Text DispStreak;
+	// public Text DispStreak;
 	public Text Perfect;
 	public Text CountdownText;
 	public bool counting_down = false;
@@ -363,6 +363,12 @@ public class spawnBeat : MonoBehaviour
 		//     m_ToggleChange = false;
 		// }
 
+		// // Check if game is paused
+		// if (game_started)
+		// {
+		// 	Time.timeScale = (m_Play)? 1:0;
+		// }
+
 		// Check the combo
 		curr_combo = 1 + Convert.ToInt32(curr_streak >= x2_streak) + Convert.ToInt32(curr_streak >= x3_streak);
 
@@ -413,8 +419,8 @@ public class spawnBeat : MonoBehaviour
 		}
 
 		// Keep track of game score, streak & combo bar
-		DispScore.text = "Game Score: " + curr_score.ToString("0.00");
-		DispStreak.text = "Streak: " + curr_streak.ToString();
+		DispScore.text = curr_score.ToString("0.00");
+		// DispStreak.text = "Streak: " + curr_streak.ToString();
 		dispCombo(Mathf.Min(curr_streak, x3_streak));
 
 		// Display perfect
@@ -516,12 +522,14 @@ public class spawnBeat : MonoBehaviour
 
 	public IEnumerator StartingCountdown(float lag = 1f)
 	{
-		counting_down = true; print("Starting countdown");
+		counting_down = true;
 		darkScreen.SetActive(true);
 		audioSource.Stop(); // idk y the audio started playing before the game started, after i added the pause functionality
+		print("Starting countdown");
 		for (int i = 3; i > 0; i--)
 		{
 			CountdownText.text = i.ToString();
+			print(i);
 			yield return new WaitForSeconds(lag);
 		}
 		CountdownText.text = "";
